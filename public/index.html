@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcript Receiver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .transcript {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .transcript-text {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .metadata {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Transcript Receiver</h1>
+    <div id="status"></div>
+    <div id="transcripts"></div>
+
+    <script>
+        // Function to format the transcript data
+        function formatTranscript(transcript) {
+            return `
+                <div class="transcript">
+                    <div class="transcript-text">${transcript.transcript}</div>
+                    <div class="metadata">
+                        <div>Session ID: ${transcript.session_id || 'N/A'}</div>
+                        <div>Timestamp: ${new Date(transcript.timestamp).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to fetch and display transcripts
+        async function fetchTranscripts() {
+            try {
+                const response = await fetch('/transcripts');
+                const transcripts = await response.json();
+                const transcriptsDiv = document.getElementById('transcripts');
+                
+                if (transcripts.length === 0) {
+                    transcriptsDiv.innerHTML = '<p>No transcripts received yet.</p>';
+                    return;
+                }
+
+                transcriptsDiv.innerHTML = transcripts
+                    .map(formatTranscript)
+                    .join('');
+            } catch (error) {
+                console.error('Error fetching transcripts:', error);
+            }
+        }
+
+        // Fetch transcripts every 5 seconds
+        fetchTranscripts();
+        setInterval(fetchTranscripts, 5000);
+    </script>
+</body>
+</html> 
